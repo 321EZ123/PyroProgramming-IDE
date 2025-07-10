@@ -9,16 +9,17 @@ export default function Home() {
   const [tab, setTab] = useState<'languages' | 'web'>('languages');
   const langs = ['python', 'java', 'cpp'] as const;
   const [language, setLanguage] = useState<typeof langs[number]>('python');
-  
+
   const defaultCode: Record<typeof langs[number], string> = {
     python: 'print("Hello, World!")',
     java: 'public class Main { public static void main(String[] args) { System.out.println("Hello, World!"); } }',
     cpp: '#include <iostream>\nint main() { std::cout << "Hello, World!"; return 0; }',
   };
-  
+
   const [code, setCode] = useState(defaultCode[language]);
   const [output, setOutput] = useState('');
-  
+  const [stdin, setStdin] = useState('');
+
   const subTabs = ['html', 'css', 'js'] as const;
   const [subTab, setSubTab] = useState<typeof subTabs[number]>('html');
   const [htmlCode, setHtmlCode] = useState('<h1>Hello, Web IDE!</h1>');
@@ -31,10 +32,11 @@ export default function Home() {
       const res = await fetch('/api/piston', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          language, 
-          code, 
-          version: "3.8" // bye bye version error
+        body: JSON.stringify({
+          language,
+          code,
+          version: "3.8", // bye bye version error
+          stdin
         }),
       });
       const data = await res.json();
@@ -48,14 +50,14 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen">
       <div className="flex">
-        <button 
-          onClick={() => setTab('languages')} 
+        <button
+          onClick={() => setTab('languages')}
           className={`${tab === 'languages' ? 'bg-gradient-to-r from-red-600 via-orange-500 to-yellow-400 text-white' : 'bg-gray-200'} px-4 py-2`}
         >
           Languages IDE
         </button>
-        <button 
-          onClick={() => setTab('web')} 
+        <button
+          onClick={() => setTab('web')}
           className={`${tab === 'web' ? 'bg-gradient-to-r from-red-600 via-orange-500 to-yellow-400 text-white' : 'bg-gray-200'} px-4 py-2`}
         >
           Web IDE
@@ -65,13 +67,13 @@ export default function Home() {
         <div className="w-1/2 border-r border-black">
           {tab === 'languages' ? (
             <div className="p-2 flex flex-col h-full">
-              <select 
-                value={language} 
-                onChange={e => { 
-                  const newLang = e.target.value as typeof langs[number]; 
-                  setLanguage(newLang); 
-                  setCode(defaultCode[newLang]); 
-                }} 
+              <select
+                value={language}
+                onChange={e => {
+                  const newLang = e.target.value as typeof langs[number];
+                  setLanguage(newLang);
+                  setCode(defaultCode[newLang]);
+                }}
                 className="mb-2 p-1 border"
               >
                 {langs.map(l => <option key={l} value={l}>{l.toUpperCase()}</option>)}
@@ -83,6 +85,14 @@ export default function Home() {
                   extensions={[language === 'python' ? python() : language === 'java' ? java() : cpp()]}
                   onChange={(value) => setCode(value)}
                 />
+                <label htmlFor="stdin" className="mt-2 block text-sm font-medium text-gray-700">Input:</label>
+                <textarea
+                  id="stdin"
+                  value={stdin}
+                  onChange={e => setStdin(e.target.value)}
+                  className="mt-1 block w-full p-2 border rounded text-sm font-mono"
+                  rows={4}
+                />
               </div>
               <button onClick={runCode} className="mt-2 bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 text-white px-4 py-2 rounded">
                 Run
@@ -92,9 +102,9 @@ export default function Home() {
             <div className="p-2 flex flex-col h-full">
               <div className="flex mb-2">
                 {subTabs.map(st => (
-                  <button 
-                    key={st} 
-                    onClick={() => setSubTab(st)} 
+                  <button
+                    key={st}
+                    onClick={() => setSubTab(st)}
                     className={`${subTab === st ? 'bg-gradient-to-r from-red-600 via-orange-500 to-yellow-400 text-white' : 'bg-gray-200'} px-3 py-1 mx-1`}
                   >
                     {st.toUpperCase()}
@@ -106,7 +116,7 @@ export default function Home() {
                   value={subTab === 'html' ? htmlCode : subTab === 'css' ? cssCode : jsCode}
                   height="100%"
                   extensions={[]}
-                  onChange={value => 
+                  onChange={value =>
                     subTab === 'html' ? setHtmlCode(value) : subTab === 'css' ? setCssCode(value) : setJsCode(value)
                   }
                 />
