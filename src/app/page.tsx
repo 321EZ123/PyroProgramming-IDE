@@ -31,7 +31,11 @@ export default function Home() {
       const res = await fetch('/api/piston', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ language, code }),
+        body: JSON.stringify({ 
+          language, 
+          code, 
+          version: "3.8" // bye bye version error
+        }),
       });
       const data = await res.json();
       setOutput(data.run?.stdout || data.run?.stderr || JSON.stringify(data, null, 2));
