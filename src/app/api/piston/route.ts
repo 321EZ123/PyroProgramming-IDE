@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    const { code, language } = await request.json();
+    const { code, language, stdin } = await request.json();
     const fileNames: Record<string, string> = {
       python: 'main.py',
       java: 'Main.java',
@@ -15,6 +15,7 @@ export async function POST(request: Request) {
         language,
         version: '*',
         files: [{ name: fileNames[language] || 'main.txt', content: code }],
+        stdin,
       }),
     });
     const result = await pistonResponse.json();
