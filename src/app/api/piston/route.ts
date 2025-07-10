@@ -2,9 +2,9 @@ export async function POST(request: Request) {
   try {
     const { language, code } = await request.json();
     const langMap: Record<string, { pistonLang: string; version: string }> = {
-      python: { pistonLang: 'python3', version: '3.8' }, 
-      java: { pistonLang: 'java', version: '11' }, 
-      cpp: { pistonLang: 'cpp17', version: '17' }, 
+      python: { pistonLang: 'python3', version: '3.8' },
+      java: { pistonLang: 'java', version: '11' },
+      cpp: { pistonLang: 'cpp17', version: '17' },
     };
     
     const langInfo = langMap[language];
@@ -17,8 +17,11 @@ export async function POST(request: Request) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
         language: langInfo.pistonLang, 
-        source: code, 
-        version: langInfo.version // should work now
+        version: langInfo.version,
+        files: [{
+          name: 'main.' + (language === 'python' ? 'py' : language === 'java' ? 'java' : 'cpp'), 
+          content: code 
+        }]
       }),
     });
 
