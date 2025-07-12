@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "PyroProgramming IDE",
   description: "Created by EZ123",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
